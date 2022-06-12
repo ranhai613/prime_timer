@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+        <meta charset="utf-8">
+        <title>素数生成機</title>
+        <style>
+            #outline{
+                width: 30%;
+                height: 10pc;
+                border: solid;
+                overflow: hidden;
+                position: relative;
+            }
+        </style>
+    </head>
+    <body>
+        <input type="button" class="st" id="start" value="START">
+        <input type="button" class="st" id="stop" value="STOP">
+        <span>アルゴリズム:合成数xはp≦√xを満たす素因子pをもつ 速度：１ミリ秒</span>
+        <div>見つけた素数の個数:<span id="count"></span></div>
+        <div>見つけた素数:<span id="discover"></span></div>
+        <p id="outline"></p>
+        <p id="log_line"></p>
+        <p id="count_past"></p>
+        <div id="max_past"></div>
+        <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js"></script>
+        <script>
+            var prime_num = Cookies.get('prime_num');
+            var prime_max = Cookies.get('prime_max');
+            $('#count_past').text('今までの最高個数:' + prime_num);
+            $('#max_past').text('今までの一番大きい素数:' + prime_max);
+            var go;
+            var count_num = 1;
+            var discover_num;
+            $('#start').on('click', function(){
+                $('#start').attr('disabled', true);
+                $('#outline').append(2 + ' ');
+                var num = 3;
+                var ii = 3;
+                go = setInterval(() => {
+                    if(ii > Math.sqrt(num)){
+                        check_next(true);
+                    }
+                    else if(num % ii == 0){
+                        check_next(false);
+                    }
+                    else{
+                        ii += 2;
+                    }
+                    $('#log_line').text(num + "を" + ii + "で割っています...");
+                    function check_next(is_prime){
+                        if(is_prime){
+                            $('#outline').append(num + ' ');
+                            count_num++;
+                            $('#count').text(count_num);
+                            $('#discover').text(num);
+                            discover_num = num;
+                            $('#outline').scrollTop($('#outline').get(0).scrollHeight);
+                        }
+                        num += 2;
+                        ii = 3;
+                    }
+                },1);
+            });
+            $('#stop').on('click', function(){
+                $('#start').attr('disabled', false);
+                clearInterval(go);
+                $('#outline').empty();
+                $('#log_line').empty();
+                if(prime_num == '' || prime_num < count_num){
+                    Cookies.set('prime_num', count_num, {expires: 365});
+                    Cookies.set('prime_max', discover_num, {expires: 365});
+                }
+            });
+        </script>
+    </body>
+</html>
